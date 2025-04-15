@@ -3,5 +3,6 @@
         "backend_lego_personal_inventory"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "python.envFile": "backend_lego_personal_inventory/.env"
 }
