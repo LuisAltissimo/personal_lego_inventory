@@ -119,3 +119,17 @@ def create_user(user: UserSchema, session: Session = Depends(get_session)):
     session.refresh(db_user)
 
     return db_user
+
+
+@app.get('/users/{user_id}', response_model=UserPublic)
+def ler_usuario_exercicio(
+    user_id: int, session: Session = Depends(get_session)
+):
+    db_user = session.scalar(select(User).where(User.id == user_id))
+
+    if not db_user:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+        )
+
+    return db_user

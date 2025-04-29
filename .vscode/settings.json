@@ -1,8 +1,10 @@
 {
+    "python.defaultInterpreterPath": "C:\\Users\\altis\\AppData\\Local\\pypoetry\\Cache\\virtualenvs\\backend-lego-personal-inventory-fdocko9p-py3.13",
     "python.testing.pytestArgs": [
         "backend_lego_personal_inventory"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.envFile": "backend_lego_personal_inventory/.env"
+    "python.envFile": "${workspaceFolder}/backend_lego_personal_inventory/.env",
+
 }
