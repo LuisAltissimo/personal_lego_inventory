@@ -24,6 +24,7 @@ Session = Annotated[SQLAlchemySession, Depends(get_session)]
 def login_for_access_token(form_data: OAuth2Form, session: Session):
     user = session.scalar(select(User).where(User.email == form_data.username))
 
+    print(user)
     if not user:
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
