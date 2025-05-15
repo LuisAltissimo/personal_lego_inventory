@@ -1,18 +1,26 @@
-from http import HTTPStatus
+from dataclasses import asdict
+
+import pytest
+from sqlalchemy import select
+
+from backend_lego_personal_inventory.models import User
 
 
-def test_create_user(client):
-    response = client.post(
-        '/users',
-        json={
-            'username': 'alice',
-            'email': 'alice@example.com',
-            'password': 'secret',
-        },
-    )
-    assert response.status_code == HTTPStatus.CREATED
-    assert response.json() == {
-        'username': 'alice',
-        'email': 'alice@example.com',
+@pytest.mark.asyncio
+async def test_create_user(session, mock_db_time):
+    with mock_db_time(model=User) as time:
+        new_user = User(
+            username='alice', password='secret', email='teste@test'
+        )
+        session.add(new_user)
+        await session.commit()
+
+    user = await session.scalar(select(User).where(User.username == 'alice'))
+
+    assert asdict(user) == {
         'id': 1,
+        'username': 'alice',
+        'password': 'secret',
+        'email': 'alice@example',
+        'created_at': time,
     }
