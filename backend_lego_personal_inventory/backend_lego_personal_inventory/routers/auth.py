@@ -38,6 +38,6 @@ async def login_for_access_token(form_data: OAuth2Form, session: Session):
             detail='Incorrect email or password',
         )
 
-    access_token = create_access_token(data={'sub': user.email})
+    access_token = await create_access_token(data={'sub': user.email})
 
     return {'access_token': access_token, 'token_type': 'bearer'}

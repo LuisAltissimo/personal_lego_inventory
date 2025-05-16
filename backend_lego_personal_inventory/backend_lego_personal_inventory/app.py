@@ -46,11 +46,11 @@ def teste():
 
 
 @app.get('/users/{user_id}', response_model=UserPublic)
-def ler_usuario_exercicio(
+async def ler_usuario_exercicio(
     user_id: int,
     session: Session,
 ):
-    db_user = session.scalar(select(User).where(User.id == user_id))
+    db_user = await session.scalar(select(User).where(User.id == user_id))
 
     if not db_user:
         raise HTTPException(

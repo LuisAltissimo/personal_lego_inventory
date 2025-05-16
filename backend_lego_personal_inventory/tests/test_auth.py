@@ -1,7 +1,8 @@
 from http import HTTPStatus
+import pytest
 
-
-def test_get_token(client, user):
+@pytest.mark.asyncio
+async def test_get_token(client, user):
     response = client.post(
         '/auth/token',
         data={'username': user.email, 'password': user.clean_password},

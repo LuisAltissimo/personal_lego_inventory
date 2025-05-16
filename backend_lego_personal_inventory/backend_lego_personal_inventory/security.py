@@ -42,7 +42,9 @@ async def get_current_user(
     except DecodeError:
         raise credentials_exception
 
-    user = await session.scalar(select(User).where(User.email == subject_email))
+    user = await session.scalar(
+        select(User).where(User.email == subject_email)
+    )
 
     if not user:
         raise credentials_exception
@@ -50,7 +52,7 @@ async def get_current_user(
     return user
 
 
-def create_access_token(data: dict):
+async def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.now(tz=ZoneInfo('UTC')) + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES

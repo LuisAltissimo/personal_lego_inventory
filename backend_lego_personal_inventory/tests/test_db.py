@@ -8,7 +8,7 @@ from backend_lego_personal_inventory.models import User
 
 @pytest.mark.asyncio
 async def test_create_user(session, mock_db_time):
-    with mock_db_time(model=User) as time:
+    async with mock_db_time(model=User) as time:
         new_user = User(
             username='alice', password='secret', email='teste@test'
         )
@@ -21,6 +21,7 @@ async def test_create_user(session, mock_db_time):
         'id': 1,
         'username': 'alice',
         'password': 'secret',
-        'email': 'alice@example',
+        'email': 'teste@test',
         'created_at': time,
+        'updated_at':time,
     }

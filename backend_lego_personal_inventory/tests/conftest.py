@@ -1,7 +1,6 @@
-from contextlib import contextmanager
+from contextlib import asynccontextmanager
 from datetime import datetime
 
-import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy import event
@@ -14,9 +13,9 @@ from backend_lego_personal_inventory.models import User, table_registry
 from backend_lego_personal_inventory.security import get_password_hash
 
 
-@pytest.fixture
-def client(session):
-    def get_session_override():
+@pytest_asyncio.fixture
+async def client(session):
+    async def get_session_override():
         return session
 
     with TestClient(app) as client:
@@ -43,8 +42,8 @@ async def session():
         await conn.run_sync(table_registry.metadata.drop_all)
 
 
-@contextmanager
-def _mock_db_time(*, model, time=datetime(2024, 1, 1)):
+@asynccontextmanager
+async def _mock_db_time(*, model, time=datetime(2024, 1, 1)):
     def fake_time_hook(mapper, connection, target):
         if hasattr(target, 'created_at'):
             target.created_at = time
@@ -58,8 +57,8 @@ def _mock_db_time(*, model, time=datetime(2024, 1, 1)):
     event.remove(model, 'before_insert', fake_time_hook)
 
 
-@pytest.fixture
-def mock_db_time():
+@pytest_asyncio.fixture
+async def mock_db_time():
     return _mock_db_time
 
 
@@ -72,16 +71,16 @@ async def user(session):
         password=get_password_hash(password),
     )
     session.add(user)
-    await session.refresh(user)
     await session.commit()
+    await session.refresh(user)
 
     user.clean_password = password
 
     return user
 
 
-@pytest.fixture
-def token(client, user):
+@pytest_asyncio.fixture
+async def token(client, user):
     response = client.post(
         '/auth/token',
         data={'username': user.email, 'password': user.clean_password},
