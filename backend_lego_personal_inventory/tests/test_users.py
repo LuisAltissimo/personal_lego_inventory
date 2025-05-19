@@ -1,7 +1,9 @@
 from http import HTTPStatus
+
 import pytest
 
 from backend_lego_personal_inventory.schemas import UserPublic
+
 
 @pytest.mark.asyncio
 async def test_create_user(client):
@@ -20,11 +22,13 @@ async def test_create_user(client):
         'id': 1,
     }
 
+
 @pytest.mark.asyncio
 async def test_read_users(client):
     response = client.get('/users')
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'users': []}
+
 
 @pytest.mark.asyncio
 async def test_update_user(client, user, token):
@@ -44,11 +48,13 @@ async def test_update_user(client, user, token):
         'id': user.id,
     }
 
+
 @pytest.mark.asyncio
 async def test_read_users_with_users(client, user):
     user_schema = UserPublic.model_validate(user).model_dump()
     response = client.get('/users/')
     assert response.json() == {'users': [user_schema]}
+
 
 @pytest.mark.asyncio
 async def test_delete_user(client, user, token):
@@ -58,6 +64,7 @@ async def test_delete_user(client, user, token):
     )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted'}
+
 
 @pytest.mark.asyncio
 async def test_update_integrity_error(client, user, token):
@@ -85,3 +92,26 @@ async def test_update_integrity_error(client, user, token):
     assert response_update.json() == {
         'detail': 'Username or Email already exists'
     }
+
+
+def test_update_user_with_wrong_user(client, other_user, token):
+    response = client.put(
+        f'/users/{other_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': 'bob',
+            'email': 'bob@example.com',
+            'password': 'mynewpassword',
+        },
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permissions'}
+
+
+def test_delete_user_wrong_user(client, other_user, token):
+    response = client.delete(
+        f'/users/{other_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permissions'}
