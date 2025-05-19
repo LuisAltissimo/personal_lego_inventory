@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session as SQLAlchemySession
 
 from backend_lego_personal_inventory.database import get_session
 from backend_lego_personal_inventory.models import User
-from backend_lego_personal_inventory.routers import auth, users
+from backend_lego_personal_inventory.routers import auth, todos, users
 from backend_lego_personal_inventory.schemas import (
     Conjunto,
     Message,
@@ -20,6 +20,7 @@ app = FastAPI()
 
 app.include_router(users.router)
 app.include_router(auth.router)
+app.include_router(todos.router)
 
 
 @app.get('/', status_code=HTTPStatus.OK, response_model=Message)
