@@ -1,5 +1,7 @@
 import factory.fuzzy
-from backend_lego_personal_inventory.models import Todo,TodoState
+
+from backend_lego_personal_inventory.models import Todo, TodoState
+
 
 class TodoFactory(factory.Factory):
     class Meta:

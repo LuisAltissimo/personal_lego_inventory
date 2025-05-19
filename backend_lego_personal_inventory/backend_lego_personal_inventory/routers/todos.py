@@ -1,13 +1,20 @@
-from typing import Annotated
 from http import HTTPStatus
+from typing import Annotated
 
-from fastapi import APIRouter, Depends,Query,HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend_lego_personal_inventory.database import get_session
 from backend_lego_personal_inventory.models import Todo, User
-from backend_lego_personal_inventory.schemas import TodoPublic, TodoSchema,TodoList,Message,FilterTodo,TodoUpdate
+from backend_lego_personal_inventory.schemas import (
+    FilterTodo,
+    Message,
+    TodoList,
+    TodoPublic,
+    TodoSchema,
+    TodoUpdate,
+)
 from backend_lego_personal_inventory.security import get_current_user
 
 router = APIRouter()
@@ -62,6 +69,7 @@ async def list_todos(
 
     return {'todos': todos.all()}
 
+
 @router.patch('/{todo_id}', response_model=TodoPublic)
 async def patch_todo(
     todo_id: int, session: Session, user: CurrentUser, todo: TodoUpdate
@@ -83,6 +91,7 @@ async def patch_todo(
     await session.refresh(db_todo)
 
     return db_todo
+
 
 @router.delete('/{todo_id}', response_model=Message)
 async def delete_todo(todo_id: int, session: Session, user: CurrentUser):

@@ -1,5 +1,7 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
 from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, EmailStr
+
 from backend_lego_personal_inventory.models import TodoState
 
 
@@ -53,10 +55,12 @@ class TodoPublic(TodoSchema):
 class TodoList(BaseModel):
     todos: list[TodoPublic]
 
+
 class FilterTodo(FilterPage):
     title: str | None = None
     description: str | None = None
     state: TodoState | None = None
+
 
 class TodoUpdate(BaseModel):
     title: str | None = None
