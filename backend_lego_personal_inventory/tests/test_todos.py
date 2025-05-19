@@ -1,8 +1,11 @@
-import factory.fuzzy
+
 import pytest
 from http import HTTPStatus
 
 from backend_lego_personal_inventory.models import Todo,TodoState
+from tests.factories import TodoFactory
+from sqlalchemy import select
+from backend_lego_personal_inventory.models import User
 
 def test_create_todo(client, token):
     response = client.post(
@@ -21,14 +24,7 @@ def test_create_todo(client, token):
         'state': 'draft',
     }
 
-class TodoFactory(factory.Factory):
-    class Meta:
-        model = Todo
 
-    title = factory.Faker('text')
-    description = factory.Faker('text')
-    state = factory.fuzzy.FuzzyChoice(TodoState)
-    user_id = 1
 
 @pytest.mark.asyncio
 async def test_list_todos_should_return_5_todos(session, client, user, token):
@@ -191,3 +187,64 @@ def test_delete_todo_error(client, token):
 
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json() == {'detail': 'Task not found.'}
+
+@pytest.mark.asyncio
+async def test_create_todo(client, token, mock_db_time):
+    async with mock_db_time(model=Todo) as time:
+        response = client.post(
+            '/todos/',
+            headers={'Authorization': f'Bearer {token}'},
+            json={
+                'title': 'Test todo',
+                'description': 'Test todo description',
+                'state': 'draft',
+            },
+        )
+
+    assert response.json() == {
+        'id': 1,
+        'title': 'Test todo',
+        'description': 'Test todo description',
+        'state': 'draft',
+        'created_at': time.isoformat(),
+        'updated_at': time.isoformat()
+    }
+
+@pytest.mark.asyncio
+async def test_list_todos_should_return_all_expected_fields__exercicio(
+    session, client, user, token, mock_db_time
+):
+    async with mock_db_time(model=Todo) as time:
+        todo = TodoFactory.create(user_id=user.id)
+        session.add(todo)
+        await session.commit()
+
+    session.refresh(todo)
+    response = client.get(
+        '/todos/',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+
+    assert response.json()['todos'] == [{
+        'created_at': time.isoformat(),
+        'updated_at': time.isoformat(),
+        'description': todo.description,
+        'id': todo.id,
+        'state': todo.state,
+        'title': todo.title,
+    }]
+
+@pytest.mark.asyncio
+async def test_create_todo_error(session, user: User):
+    todo = Todo(
+        title='Test Todo',
+        description='Test Desc',
+        state='test',
+        user_id=user.id,
+    )
+
+    session.add(todo)
+    await session.commit()
+
+    with pytest.raises(LookupError):
+        await session.scalar(select(Todo))
