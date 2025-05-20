@@ -3,6 +3,7 @@ from dataclasses import asdict
 import pytest
 from sqlalchemy import select
 
+# from time import time
 from backend_lego_personal_inventory.models import Todo, User
 
 
@@ -42,12 +43,17 @@ async def test_create_todo(session, user):
 
     todo = await session.scalar(select(Todo))
 
+    created_at = todo.created_at
+    updated_at = todo.updated_at
+
     assert asdict(todo) == {
         'description': 'Test Desc',
         'id': 1,
         'state': 'draft',
         'title': 'Test Todo',
         'user_id': 1,
+        'created_at': created_at,
+        'updated_at': updated_at,
     }
 
 

@@ -4,9 +4,8 @@ from datetime import datetime
 import factory
 import pytest_asyncio
 from fastapi.testclient import TestClient
-from sqlalchemy import event
+from sqlalchemy import StaticPool, event
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.pool import StaticPool
 
 from backend_lego_personal_inventory.app import app
 from backend_lego_personal_inventory.database import get_session
@@ -42,6 +41,7 @@ async def session():
         connect_args={'check_same_thread': False},
         poolclass=StaticPool,
     )
+
     async with engine.begin() as conn:
         await conn.run_sync(table_registry.metadata.create_all)
 
